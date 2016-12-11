@@ -9,6 +9,8 @@ public class StringServiceImpl extends UnicastRemoteObject implements StringServ
 	public static final long serialVersionUID = 1L;
 	private Resultator res; // object it returns
 	private Levenshtein levenshtein = new Levenshtein(); // comparison algorithm
+	private DamerauLevenshtein dameraulevenshtein = new DamerauLevenshtein(); // comparison algorithm
+	private HammingDistance hammingdistance = new HammingDistance(); // comparison algorithm
 	private int distance; //result of Levenshtein
 	
 	protected StringServiceImpl() throws RemoteException {
@@ -29,6 +31,26 @@ public class StringServiceImpl extends UnicastRemoteObject implements StringServ
 			
 			// setting the class variable distance by calling the distance method in the algorithm
 			distance = levenshtein.distance(s, t);
+			//sets the result and converts the integer to a string so it matches with setResult() variables
+			res.setResult(Integer.toString(distance));
+			
+			//thread.sleep will go here
+			
+			// sets the process to true
+			res.setProcessed();
+		} else if (algo.toLowerCase() == "damerau-levenshtein distance") {
+			// setting the class variable distance by calling the distance method in the algorithm
+			distance = dameraulevenshtein.distance(s, t);
+			//sets the result and converts the integer to a string so it matches with setResult() variables
+			res.setResult(Integer.toString(distance));
+			
+			//thread.sleep will go here
+			
+			// sets the process to true
+			res.setProcessed();
+		} else if (algo.toLowerCase() == "hamming distance"){
+			// setting the class variable distance by calling the distance method in the algorithm
+			distance = hammingdistance.distance(s, t);
 			//sets the result and converts the integer to a string so it matches with setResult() variables
 			res.setResult(Integer.toString(distance));
 			

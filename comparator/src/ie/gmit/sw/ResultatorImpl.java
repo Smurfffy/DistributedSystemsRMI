@@ -13,7 +13,7 @@ public class ResultatorImpl extends UnicastRemoteObject implements Resultator {
 	// Result is gotten from the comparison algorithms(distance) set in this class so that the servlet can retreive it 
 	//process is initially false because no comparison has been made. when comparison is made in stringserviceImpl it is set to true 
 	public ResultatorImpl() throws RemoteException {
-		this.result = null;
+		//this.result = null;
 		this.process = false;
 	}
 	

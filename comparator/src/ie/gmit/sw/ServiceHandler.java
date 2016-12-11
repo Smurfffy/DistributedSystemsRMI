@@ -1,16 +1,32 @@
 package ie.gmit.sw;
 
 import java.io.*;
+import java.rmi.Naming;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+
 import javax.servlet.*;
 import javax.servlet.http.*;
 
 public class ServiceHandler extends HttpServlet {
 	private String remoteHost = null;
 	private static long jobNumber = 0;
-
+	
+	//
+	private static Map<String, Resultator> outQueue = new ConcurrentHashMap<String, Resultator>();
+	//
+	
 	public void init() throws ServletException {
 		ServletContext ctx = getServletContext();
 		remoteHost = ctx.getInitParameter("RMI_SERVER"); //Reads the value from the <context-param> in web.xml
+	}
+	
+	// Generates a large random Job Number
+	public void random(){
+		Random generator = new Random();
+		jobNumber = generator.nextInt(9581453) + 10000;
 	}
 
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -28,17 +44,30 @@ public class ServiceHandler extends HttpServlet {
 		out.print("</head>");		
 		out.print("<body>");
 		
-		if (taskNumber == null){
-			taskNumber = new String("T" + jobNumber);
-			jobNumber++;
-			//Add job to in-queue
-		}else{
-			//Check out-queue for finished job
+		try{
+			
+			StringService ss = (StringService) Naming.lookup("rmi://localhost:1099/StringService");
+			
+			if (taskNumber == null){
+				//generates the random job number to be displayed
+				random();
+				taskNumber = new String("T" + jobNumber);
+				jobNumber++;
+				// gets a displayes the result...currently displayed as null and I am unsure why...
+				Resultator r = ss.compare(s, t, algorithm);
+				out.print("<br> distance " + r.getResult());
+				
+			}else{
+				//Check out-queue for finished job
+			}
+		}catch(Exception e){
+			e.printStackTrace();
 		}
 		
 		
 		
-		out.print("<H1>Processing request for Job#: " + taskNumber + "</H1>");
+		
+		out.print("<H1>Processing request f Job#: " + taskNumber + "</H1>");
 		out.print("<div id=\"r\"></div>");
 		
 		out.print("<font color=\"#993333\"><b>");
@@ -46,7 +75,7 @@ public class ServiceHandler extends HttpServlet {
 		out.print("<br>Algorithm: " + algorithm);		
 		out.print("<br>String <i>s</i> : " + s);
 		out.print("<br>String <i>t</i> : " + t);
-		out.print("<br>This servlet should only be responsible for handling client request and returning responses. Everything else should be handled by different objects.");
+		/*out.print("<br>This servlet should only be responsible for handling client request and returning responses. Everything else should be handled by different objects.");
 		out.print("Note that any variables declared inside this doGet() method are thread safe. Anything defined at a class level is shared between HTTP requests.");				
 		out.print("</b></font>");
 
@@ -60,7 +89,7 @@ public class ServiceHandler extends HttpServlet {
 		out.print("<LI>Poll a message request from the front of the queue and make an RMI call to the String Comparison Service.");			
 		out.print("<LI>Get the <i>Resultator</i> (a stub that is returned IMMEDIATELY by the remote method) and add it to a Map (the OUT-queue) using the jobNumber as the key and the <i>Resultator</i> as a value.");	
 		out.print("<LI>Return the result of the string comparison to the client next time a request for the jobNumber is received and the <i>Resultator</i> returns true for the method <i>isComplete().</i>");	
-		out.print("</OL>");	
+		out.print("</OL>");	*/
 		
 		out.print("<form name=\"frmRequestDetails\">");
 		out.print("<input name=\"cmbAlgorithm\" type=\"hidden\" value=\"" + algorithm + "\">");
